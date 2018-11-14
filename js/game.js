@@ -18,18 +18,18 @@ OregonH.ENEMY_GOLD_AVG = 50;
 OregonH.Game = {};
 
 // GAME INITIATION
-OregonH.Game.init = function(){
+OregonH.Game.init = function init() {
   // CARAVAN SETUP
-  this.caravan = OregonH.Caravan;
-  this.caravan.init({
-    day: 0,
-    distance: 0,
-    crew: 30,
-    food: 80,
-    oxen: 2,
-    money: 300,
-    firepower: 2
-  });
+  this.caravan = OregonH.Caravan;
+  this.caravan.init({
+    day: 0,
+    distance: 0,
+    crew: 30,
+    food: 80,
+    oxen: 2,
+    money: 300,
+    firepower: 2,
+  });
 };
 
 
