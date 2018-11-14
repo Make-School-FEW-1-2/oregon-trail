@@ -1,8 +1,8 @@
-var OregonH = OregonH || {};
+const OregonH = OregonH || {};
 
 OregonH.Caravan = {};
 
-OregonH.Caravan.init = function (stats) {
+OregonH.Caravan.init = function init(stats) {
   this.day = stats.day;
   this.distance = stats.distance;
   this.crew = stats.crew;
@@ -13,7 +13,7 @@ OregonH.Caravan.init = function (stats) {
 };
 
 // update weight and capacity
-OregonH.Caravan.updateWeight = function () {
+OregonH.Caravan.updateWeight = function updateWeight() {
   let droppedFood = 0;
   let droppedGuns = 0;
 
@@ -26,9 +26,9 @@ OregonH.Caravan.updateWeight = function () {
   // drop things behind if it's too much weight
   // assume guns get dropped before food
   while (this.firepower && this.capacity <= this.weight) {
-    this.firepower--;
+    this.firepower -= 1;
     this.weight -= OregonH.FIREPOWER_WEIGHT;
-    droppedGuns++;
+    droppedGuns += 1;
   }
 
   if (droppedGuns) {
@@ -36,9 +36,9 @@ OregonH.Caravan.updateWeight = function () {
   }
 
   while (this.food && this.capacity <= this.weight) {
-    this.food--;
+    this.food -= 1;
     this.weight -= OregonH.FOOD_WEIGHT;
-    droppedFood++;
+    droppedFood += 1;
   }
 
   if (droppedFood) {
@@ -47,7 +47,7 @@ OregonH.Caravan.updateWeight = function () {
 };
 
 // update covered distance
-OregonH.Caravan.updateDistance = function () {
+OregonH.Caravan.updateDistance = function updateDistance() {
   // the closer to capacity, the slower
   const diff = this.capacity - this.weight;
   const speed = OregonH.SLOW_SPEED + diff / this.capacity * OregonH.FULL_SPEED;
@@ -55,7 +55,7 @@ OregonH.Caravan.updateDistance = function () {
 };
 
 // food consumption
-OregonH.Caravan.consumeFood = function () {
+OregonH.Caravan.consumeFood = function consumeFood() {
   this.food -= this.crew * OregonH.FOOD_PER_PERSON;
 
   if (this.food < 0) {
