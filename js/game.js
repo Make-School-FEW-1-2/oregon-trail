@@ -44,6 +44,8 @@ OregonH.Game.init = function init() {
   this.eventManager.game = this;
   this.eventManager.caravan = this.caravan;
   this.eventManager.ui = this.ui;
+
+  this.startJourney();
 };
 // start the journey and time starts running
 OregonH.Game.startJourney = function startJourney() {
