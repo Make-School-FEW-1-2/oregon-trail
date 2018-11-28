@@ -1,4 +1,4 @@
-const OregonH = OregonH || {};
+var OregonH = OregonH || {};
 
 OregonH.Caravan = {};
 
@@ -48,7 +48,6 @@ OregonH.Caravan.updateWeight = function updateWeight() {
 
 // update covered distance
 OregonH.Caravan.updateDistance = function updateDistance() {
-  // the closer to capacity, the slower
   const diff = this.capacity - this.weight;
   const speed = OregonH.SLOW_SPEED + diff / this.capacity * OregonH.FULL_SPEED;
   this.distance += speed;

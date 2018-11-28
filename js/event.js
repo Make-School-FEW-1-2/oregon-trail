@@ -1,3 +1,3 @@
-var OregonH = OregenH || {};
+var OregonH = OregonH || {};
 
 OregonH.Event = {};
