@@ -118,7 +118,6 @@ OregonH.Game.updateGame = function updateGame() {
   if (Math.random() <= OregonH.EVENT_PROBABILITY) {
     this.eventManager.generateEvent();
   }
-
 };
 
 // pause the journey
