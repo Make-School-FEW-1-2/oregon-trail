@@ -86,7 +86,7 @@ OregonH.Game.updateGame = function updateGame() {
   this.caravan.consumeFood();
 
   // game over no food
-  if (this.caravan.food === 0) {
+  if (this.caravan.food === '0') {
     this.ui.notify('Your caravan starved to death', 'negative');
     this.gameActive = false;
     return;
@@ -102,7 +102,7 @@ OregonH.Game.updateGame = function updateGame() {
   this.ui.refreshStats();
 
   // check if everyone died
-  if (this.caravan.crew <= 0) {
+  if (this.caravan.crew <= '0') {
     this.caravan.crew = 0;
     this.ui.notify('Everyone died', 'negative');
     this.gameActive = false;
