@@ -1,136 +1,103 @@
-const OregonH = OregonH || {}; // eslint-disable-line no-use-before-define
+const UI = require('./ui');
+const Caravan = require('./caravan');
+const Event = require('./event');
 
-// CONSTANTS
-OregonH.WEIGHT_PER_OX = 20;
-OregonH.WEIGHT_PER_PERSON = 2;
-OregonH.FOOD_WEIGHT = 0.6;
-OregonH.FIREPOWER_WEIGHT = 5;
-OregonH.GAME_SPEED = 800;
-OregonH.DAY_PER_STEP = 0.2;
-OregonH.FOOD_PER_PERSON = 0.02;
-OregonH.FULL_SPEED = 5;
-OregonH.SLOW_SPEED = 3;
-OregonH.FINAL_DISTANCE = 1000;
-OregonH.EVENT_PROBABILITY = 0.15;
-OregonH.ENEMY_FIREPOWER_AVG = 5;
-OregonH.ENEMY_GOLD_AVG = 50;
-
-OregonH.Game = {};
-
-// GAME INITIATION
-OregonH.Game.init = function init() {
-  this.ui = OregonH.UI;
-
-  this.eventManager = OregonH.Event;
-
-  // CARAVAN SETUP
-  this.caravan = OregonH.Caravan;
-  this.caravan.init({
-    day: 0,
-    distance: 0,
-    crew: 30,
-    food: 80,
-    oxen: 2,
-    money: 300,
-    firepower: 2,
-  });
-  this.caravan.ui = this.ui;
-  this.caravan.eventManager = this.eventManager;
-
-  this.ui.game = this;
-  this.ui.caravan = this.caravan;
-  this.ui.eventManager = this.eventManager;
-
-  this.eventManager.game = this;
-  this.eventManager.caravan = this.caravan;
-  this.eventManager.ui = this.ui;
-
-  this.startJourney();
-};
-// start the journey and time starts running
-OregonH.Game.startJourney = function startJourney() {
-  this.gameActive = true;
-  this.previousTime = null;
-  this.ui.notify('A great adventure begins', 'positive');
-
-  this.step();
-};
-
-// game loop
-OregonH.Game.step = function step(timestamp) {
-  // starting, setup the previous time for the first time
-  if (!this.previousTime) {
-    this.previousTime = timestamp;
-    this.updateGame();
+class Game {
+  constructor() {
+    this.ui = new UI();
+    this.caravan = new Caravan({
+      day: 0,
+      distance: 0,
+      crew: 30,
+      food: 80,
+      oxen: 2,
+      money: 300,
+      firepower: 2,
+    });
+    this.event = new Event();
+    this.startJourney();
   }
 
-  // time difference
-  const progress = timestamp - this.previousTime;
+  startJourney() {
+    this.gameActive = true;
+    this.previousTime = null;
+    this.ui.notify('A great adventure begins', 'positive');
 
-  // game update
-  if (progress >= OregonH.GAME_SPEED) {
-    this.previousTime = timestamp;
-    this.updateGame();
+    this.step();
   }
 
-  // we use "bind" so that we can refer to the context "this" inside of the step method
-  if (this.gameActive) window.requestAnimationFrame(this.step.bind(this));
-};
+  step(timestamp) {
+    // starting, setup the previous time for the first time
+    if (!this.previousTime) {
+      this.previousTime = timestamp;
+      this.updateGame();
+    }
 
-// update game stats
-OregonH.Game.updateGame = function updateGame() {
-  // day update
-  this.caravan.day += OregonH.DAY_PER_STEP;
+    // time difference
+    const progress = timestamp - this.previousTime;
 
-  // food consumption
-  this.caravan.consumeFood();
+    // game update
+    if (progress >= Caravan.GAME_SPEED) {
+      this.previousTime = timestamp;
+      this.updateGame();
+    }
 
-  // game over no food
-  if (this.caravan.food === '0') {
-    this.ui.notify('Your caravan starved to death', 'negative');
-    this.gameActive = false;
-    return;
+    // we use "bind" so that we can refer to the context "this" inside of the step method
+    if (this.gameActive) window.requestAnimationFrame(this.step.bind(this));
   }
 
-  // update weight
-  this.caravan.updateWeight();
+  updateGame() {
+    // day update
+    this.caravan.day += Caravan.DAY_PER_STEP;
 
-  // update progress
-  this.caravan.updateDistance();
+    // food consumption
+    this.caravan.consumeFood();
 
-  // show stats
-  this.ui.refreshStats();
+    // game over no food
+    if (this.caravan.food === '0') {
+      this.ui.notify('Your caravan starved to death', 'negative');
+      this.gameActive = false;
+      return;
+    }
 
-  // check if everyone died
-  if (this.caravan.crew <= '0') {
-    this.caravan.crew = 0;
-    this.ui.notify('Everyone died', 'negative');
-    this.gameActive = false;
-    return;
+    // update weight
+    this.caravan.updateWeight();
+
+    // update progress
+    this.caravan.updateDistance();
+
+    // show stats
+    this.ui.refreshStats();
+
+    // check if everyone died
+    if (this.caravan.crew <= '0') {
+      this.caravan.crew = 0;
+      this.ui.notify('Everyone died', 'negative');
+      this.gameActive = false;
+      return;
+    }
+
+    // check win game
+    if (this.caravan.distance >= Caravan.FINAL_DISTANCE) {
+      this.ui.notify('You have returned home!', 'positive');
+      this.gameActive = false;
+    }
+
+    if (Math.random() <= Caravan.EVENT_PROBABILITY) {
+      this.eventManager.generateEvent();
+    }
   }
 
-  // check win game
-  if (this.caravan.distance >= OregonH.FINAL_DISTANCE) {
-    this.ui.notify('You have returned home!', 'positive');
+  pause() {
     this.gameActive = false;
   }
 
-  if (Math.random() <= OregonH.EVENT_PROBABILITY) {
-    this.eventManager.generateEvent();
+  resume() {
+    this.gameActive = true;
+    this.step();
   }
+}
+
+module.exports = {
+  Game,
 };
-
-// pause the journey
-OregonH.Game.pauseJourney = function pause() {
-  this.gameActive = false;
-};
-
-// resume the journey
-OregonH.Game.resumeJourney = function resume() {
-  this.gameActive = true;
-  this.step();
-};
-
-
-// init game
-OregonH.Game.init();
