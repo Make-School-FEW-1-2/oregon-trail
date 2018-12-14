@@ -1,10 +1,5 @@
-const UI = require('./ui');
-const Caravan = require('./caravan');
-const Event = require('./event');
-
 class Game {
   constructor() {
-    this.ui = new UI();
     this.caravan = new Caravan({
       day: 0,
       distance: 0,
@@ -14,7 +9,8 @@ class Game {
       money: 300,
       firepower: 2,
     });
-    this.event = new Event();
+    this.ui = new UI(this.caravan, this);
+    this.event = new Event(this, this.ui, this.caravan);
     this.startJourney();
   }
 
@@ -37,7 +33,7 @@ class Game {
     const progress = timestamp - this.previousTime;
 
     // game update
-    if (progress >= Caravan.GAME_SPEED) {
+    if (progress >= Caravan.constants.GAME_SPEED) {
       this.previousTime = timestamp;
       this.updateGame();
     }
@@ -48,7 +44,7 @@ class Game {
 
   updateGame() {
     // day update
-    this.caravan.day += Caravan.DAY_PER_STEP;
+    this.caravan.day += Caravan.constants.DAY_PER_STEP;
 
     // food consumption
     this.caravan.consumeFood();
@@ -67,7 +63,7 @@ class Game {
     this.caravan.updateDistance();
 
     // show stats
-    this.ui.refreshStats();
+    this.ui.refresh();
 
     // check if everyone died
     if (this.caravan.crew <= '0') {
@@ -78,12 +74,12 @@ class Game {
     }
 
     // check win game
-    if (this.caravan.distance >= Caravan.FINAL_DISTANCE) {
+    if (this.caravan.distance >= Caravan.constants.FINAL_DISTANCE) {
       this.ui.notify('You have returned home!', 'positive');
       this.gameActive = false;
     }
 
-    if (Math.random() <= Caravan.EVENT_PROBABILITY) {
+    if (Math.random() <= Caravan.constantsEVENT_PROBABILITY) {
       this.eventManager.generateEvent();
     }
   }
@@ -97,7 +93,3 @@ class Game {
     this.step();
   }
 }
-
-module.exports = {
-  Game,
-};

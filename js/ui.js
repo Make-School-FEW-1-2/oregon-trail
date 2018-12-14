@@ -1,5 +1,3 @@
-const Caravan = require('./caravan');
-
 class UI {
   constructor(caravan, game) {
     this.caravan = caravan;
@@ -21,7 +19,7 @@ class UI {
     document.getElementById('stat-weight').innerHTML = `${Math.ceil(this.caravan.weight)}/${this.caravan.capacity}`;
 
     // update caravan position
-    document.getElementById('caravan').style.left = `${380 * this.caravan.distance / Caravan.FINAL_DISTANCE}px`;
+    document.getElementById('caravan').style.left = `${380 * this.caravan.distance / Caravan.constants.FINAL_DISTANCE}px`;
   }
 
   showAttack(firepower, gold) {
@@ -146,12 +144,8 @@ class UI {
     this.caravan.updateWeight();
 
     // update visualgas
-    this.refreshStats();
+    this.refresh();
 
     return true;
   }
 }
-
-module.exports = {
-  UI,
-};

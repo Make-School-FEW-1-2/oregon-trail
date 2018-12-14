@@ -18,7 +18,7 @@ class Caravan {
       FOOD_PER_PERSON: 0.02,
       FULL_SPEED: 5,
       SLOW_SPEED: 3,
-      FINAL_DISTANC: 1000,
+      FINAL_DISTANCE: 1000,
       EVENT_PROBABILITY: 0.15,
       ENEMY_FIREPOWER_AVG: 5,
       ENEMY_GOLD_AVG: 50,
@@ -78,7 +78,3 @@ class Caravan {
     }
   }
 }
-
-module.exports = {
-  Caravan,
-};
