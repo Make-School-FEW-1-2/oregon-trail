@@ -1,4 +1,4 @@
-var OregonH = OregonH || {};
+const OregonH = OregonH || {}; // eslint-disable-line no-use-before-define
 
 // CONSTANTS
 OregonH.WEIGHT_PER_OX = 20;
