@@ -1,155 +1,157 @@
-const OregonH = OregonH || {}; // eslint-disable-line no-use-before-define
+const Caravan = require('./caravan');
 
-OregonH.UI = {};
-
-// show a notification in the message area
-OregonH.UI.notify = function notify(message, type) {
-  document.getElementById('updates-area').innerHTML = `<div class="update-${type}">Day ${Math.ceil(this.caravan.day)}: ${message}</div>${document.getElementById('updates-area').innerHTML}`;
-};
-
-// refresh visual caravan stats
-OregonH.UI.refreshStats = function refresh() {
-  document.getElementById('stat-day').innerHTML = Math.ceil(this.caravan.day);
-  document.getElementById('stat-distance').innerHTML = Math.floor(this.caravan.distance);
-  document.getElementById('stat-crew').innerHTML = this.caravan.crew;
-  document.getElementById('stat-oxen').innerHTML = this.caravan.oxen;
-  document.getElementById('stat-food').innerHTML = Math.ceil(this.caravan.food);
-  document.getElementById('stat-money').innerHTML = this.caravan.money;
-  document.getElementById('stat-firepower').innerHTML = this.caravan.firepower;
-  document.getElementById('stat-weight').innerHTML = `${Math.ceil(this.caravan.weight)}/${this.caravan.capacity}`;
-
-  // update caravan position
-  document.getElementById('caravan').style.left = `${380 * this.caravan.distance / OregonH.FINAL_DISTANCE}px`;
-};
-
-// show attack
-OregonH.UI.showAttack = function showAttack(firepower, gold) {
-  const attackDiv = document.getElementById('attack');
-  attackDiv.classList.remove('hidden');
-
-  // keep properties
-  this.firepower = firepower;
-  this.gold = gold;
-
-  // show firepower
-  document.getElementById('attack-description').innerHTML = `Firepower: ${firepower}`;
-
-  // init once
-  if (!this.attackInitiated) {
-    // fight
-    document.getElementById('fight').addEventListener('click', this.fight.bind(this));
-
-    // run away
-    document.getElementById('runaway').addEventListener('click', this.runaway.bind(this));
-
-    this.attackInitiated = true;
-  }
-};
-
-// fight
-OregonH.UI.fight = function fight() {
-  const damage = Math.ceil(
-    Math.max(0, this.firepower * 2 * Math.random() - this.caravan.firepower),
-  );
-
-  // check there are survivors
-  if (damage < this.caravan.crew) {
-    this.caravan.crew -= damage;
-    this.caravan.money += this.gold;
-    this.notify(`${damage} people were killed fighting`, 'negative');
-    this.notify(`Found $${this.gold}`, 'gold');
-  } else {
-    this.caravan.crew = 0;
-    this.notify('Everybody died in the fight', 'negative');
+class UI {
+  constructor(caravan, game) {
+    this.caravan = caravan;
+    this.game = game;
   }
 
-  // resume journey
-  document.getElementById('attack').classList.add('hidden');
-  this.game.resumeJourney();
-};
-
-// runing away from enemy
-OregonH.UI.runaway = function runaway() {
-  const damage = Math.ceil(Math.max(0, this.firepower * Math.random() / 2));
-
-  // check there are survivors
-  if (damage < this.caravan.crew) {
-    this.caravan.crew -= damage;
-    this.notify(`${damage} people were killed running`, 'negative');
-  } else {
-    this.caravan.crew = 0;
-    this.notify('Everybody died running away', 'negative');
+  notify(message, type) {
+    document.getElementById('updates-area').innerHTML = `<div class="update-${type}">Day ${Math.ceil(this.caravan.day)}: ${message}</div>${document.getElementById('updates-area').innerHTML}`;
   }
 
-  // // remove event listener
-  // document.getElementById('runaway').removeEventListener('click', this.runaway.bind(this));
+  refresh() {
+    document.getElementById('stat-day').innerHTML = Math.ceil(this.caravan.day);
+    document.getElementById('stat-distance').innerHTML = Math.floor(this.caravan.distance);
+    document.getElementById('stat-crew').innerHTML = this.caravan.crew;
+    document.getElementById('stat-oxen').innerHTML = this.caravan.oxen;
+    document.getElementById('stat-food').innerHTML = Math.ceil(this.caravan.food);
+    document.getElementById('stat-money').innerHTML = this.caravan.money;
+    document.getElementById('stat-firepower').innerHTML = this.caravan.firepower;
+    document.getElementById('stat-weight').innerHTML = `${Math.ceil(this.caravan.weight)}/${this.caravan.capacity}`;
 
-  // resume journey
-  document.getElementById('attack').classList.add('hidden');
-  this.game.resumeJourney();
-};
-
-// show shop
-OregonH.UI.showShop = function showShop(products) {
-  // get shop area
-  const shopDiv = document.getElementById('shop');
-  shopDiv.classList.remove('hidden');
-
-  // init the shop just once
-  if (!this.shopInitiated) {
-    // event delegation
-    shopDiv.addEventListener('click', (e) => {
-      // what was clicked
-      const target = e.target || e.src;
-
-      // exit button
-      if (target.tagName === 'BUTTON') {
-        // resume journey
-        shopDiv.classList.add('hidden');
-        OregonH.UI.game.resumeJourney();
-      } else if (target.tagName === 'DIV' && target.className.match(/product/)) {
-        OregonH.UI.buyProduct({
-          item: target.getAttribute('data-item'),
-          qty: target.getAttribute('data-qty'),
-          price: target.getAttribute('data-price'),
-        });
-      }
-    });
-
-    this.shopInitiated = true;
+    // update caravan position
+    document.getElementById('caravan').style.left = `${380 * this.caravan.distance / Caravan.FINAL_DISTANCE}px`;
   }
 
-  // clear existing content
-  const prodsDiv = document.getElementById('prods');
-  prodsDiv.innerHTML = '';
+  showAttack(firepower, gold) {
+    const attackDiv = document.getElementById('attack');
+    attackDiv.classList.remove('hidden');
 
-  // show products
-  let product;
-  for (let i = 0; i < products.length; i += 1) {
-    product = products[i];
-    prodsDiv.innerHTML += `<div class="product" data-qty="${product.qty}" data-item="${product.item}" data-price="${product.price}">${product.qty} ${product.item} - $${product.price}</div>`;
+    // keep properties
+    this.firepower = firepower;
+    this.gold = gold;
+
+    // show firepower
+    document.getElementById('attack-description').innerHTML = `Firepower: ${firepower}`;
+
+    // init once
+    if (!this.attackInitiated) {
+      // fight
+      document.getElementById('fight').addEventListener('click', this.fight.bind(this));
+
+      // run away
+      document.getElementById('runaway').addEventListener('click', this.runaway.bind(this));
+
+      this.attackInitiated = true;
+    }
   }
-};
 
-// buy product
-OregonH.UI.buyProduct = function buyProduct(product) {
-  // check we can afford it
-  if (product.price > OregonH.UI.caravan.money) {
-    OregonH.UI.notify('Not enough money', 'negative');
-    return false;
+  fight() {
+    const damage = Math.ceil(
+      Math.max(0, this.firepower * 2 * Math.random() - this.caravan.firepower),
+    );
+
+    // check there are survivors
+    if (damage < this.caravan.crew) {
+      this.caravan.crew -= damage;
+      this.caravan.money += this.gold;
+      this.notify(`${damage} people were killed fighting`, 'negative');
+      this.notify(`Found $${this.gold}`, 'gold');
+    } else {
+      this.caravan.crew = 0;
+      this.notify('Everybody died in the fight', 'negative');
+    }
+
+    // resume journey
+    document.getElementById('attack').classList.add('hidden');
+    this.game.resumeJourney();
   }
 
-  OregonH.UI.caravan.money -= product.price;
+  runaway() {
+    const damage = Math.ceil(Math.max(0, this.firepower * Math.random() / 2));
 
-  OregonH.UI.caravan[product.item] += +product.qty;
+    // check there are survivors
+    if (damage < this.caravan.crew) {
+      this.caravan.crew -= damage;
+      this.notify(`${damage} people were killed running`, 'negative');
+    } else {
+      this.caravan.crew = 0;
+      this.notify('Everybody died running away', 'negative');
+    }
 
-  OregonH.UI.notify(`Bought ${product.qty} x ${product.item}`, 'positive');
+    // // remove event listener
+    // document.getElementById('runaway').removeEventListener('click', this.runaway.bind(this));
 
-  // update weight
-  OregonH.UI.caravan.updateWeight();
+    // resume journey
+    document.getElementById('attack').classList.add('hidden');
+    this.game.resumeJourney();
+  }
 
-  // update visuals
-  OregonH.UI.refreshStats();
+  showShop(products) {
+    // get shop area
+    const shopDiv = document.getElementById('shop');
+    shopDiv.classList.remove('hidden');
 
-  return true;
+    // init the shop just once
+    if (!this.shopInitiated) {
+      // event delegation
+      shopDiv.addEventListener('click', (e) => {
+        // what was clicked
+        const target = e.target || e.src;
+
+        // exit button
+        if (target.tagName === 'BUTTON') {
+          // resume journey
+          shopDiv.classList.add('hidden');
+          this.game.resumeJourney();
+        } else if (target.tagName === 'DIV' && target.className.match(/product/)) {
+          this.buyProduct({
+            item: target.getAttribute('data-item'),
+            qty: target.getAttribute('data-qty'),
+            price: target.getAttribute('data-price'),
+          });
+        }
+      });
+
+      this.shopInitiated = true;
+    }
+
+    // clear existing content
+    const prodsDiv = document.getElementById('prods');
+    prodsDiv.innerHTML = '';
+
+    // show products
+    let product;
+    for (let i = 0; i < products.length; i += 1) {
+      product = products[i];
+      prodsDiv.innerHTML += `<div class="product" data-qty="${product.qty}" data-item="${product.item}" data-price="${product.price}">${product.qty} ${product.item} - $${product.price}</div>`;
+    }
+  }
+
+  buyProduct(product) {
+    // check we can afford it
+    if (product.price > this.caravan.money) {
+      this.notify('Not enough money', 'negative');
+      return false;
+    }
+
+    this.caravan.money -= product.price;
+
+    this.caravan[product.item] += +product.qty;
+
+    this.notify(`Bought ${product.qty} x ${product.item}`, 'positive');
+
+    // update weight
+    this.caravan.updateWeight();
+
+    // update visualgas
+    this.refreshStats();
+
+    return true;
+  }
+}
+
+module.exports = {
+  UI,
 };
