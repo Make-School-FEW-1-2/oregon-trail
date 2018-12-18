@@ -1,7 +1,7 @@
 class Game {
   constructor() {
     this.caravan = new Caravan({
-      day: 0,
+      day: 1,
       distance: 0,
       crew: 30,
       food: 80,
@@ -79,8 +79,8 @@ class Game {
       this.gameActive = false;
     }
 
-    if (Math.random() <= Caravan.constantsEVENT_PROBABILITY) {
-      this.eventManager.generateEvent();
+    if (Math.random() <= Caravan.constants.EVENT_PROBABILITY) {
+      this.event.generateEvent();
     }
   }
 

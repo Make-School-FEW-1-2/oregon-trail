@@ -63,7 +63,7 @@ class UI {
 
     // resume journey
     document.getElementById('attack').classList.add('hidden');
-    this.game.resumeJourney();
+    this.game.resume();
   }
 
   runaway() {
@@ -83,7 +83,7 @@ class UI {
 
     // resume journey
     document.getElementById('attack').classList.add('hidden');
-    this.game.resumeJourney();
+    this.game.resume();
   }
 
   showShop(products) {
@@ -102,7 +102,7 @@ class UI {
         if (target.tagName === 'BUTTON') {
           // resume journey
           shopDiv.classList.add('hidden');
-          this.game.resumeJourney();
+          this.game.resume();
         } else if (target.tagName === 'DIV' && target.className.match(/product/)) {
           this.buyProduct({
             item: target.getAttribute('data-item'),

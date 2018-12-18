@@ -154,7 +154,9 @@ class Event {
     this.ui = ui;
     this.game = game;
     this.caravan = caravan;
+  }
 
+  generateEvent() {
     const eventIndex = Math.floor(Math.random() * Event.eventTypes.length);
     const eventData = Event.eventTypes[eventIndex];
 
@@ -163,20 +165,19 @@ class Event {
       this.stateChangeEvent(eventData);
     } else if (eventData.type === 'SHOP') {
       // pause game
-      game.pause();
+      this.game.pause();
 
       // notify user
-      ui.notify(eventData.text, eventData.notification);
+      this.ui.notify(eventData.text, eventData.notification);
 
       // prepare event
       this.shopEvent(eventData);
     } else if (eventData.type === 'ATTACK') {
-      game.pause();
-      ui.notify(eventData.text, eventData.notification);
+      this.game.pause();
+      this.ui.notify(eventData.text, eventData.notification);
       this.attackEvent(eventData);
     }
   }
-
 
 
   stateChangeEvent(eventData) {
@@ -237,9 +238,9 @@ class Event {
   // TODO: is this thhe correct way to approach this?
   attackEvent() {
     const firepower = Math.round((0.7 + 0.6 * Math.random())
-      * Caravan.constant.ENEMY_FIREPOWER_AVG);
+      * Caravan.constants.ENEMY_FIREPOWER_AVG);
     const gold = Math.round((0.7 + 0.6 * Math.random())
-      * Caravan.constant.ENEMY_GOLD_AVG);
+      * Caravan.constants.ENEMY_GOLD_AVG);
 
     this.ui.showAttack(firepower, gold);
   }
